@@ -9,6 +9,17 @@ def createGraph(vertices,edges):
     Graph[vertex2].append(vertex1)
   return Graph
 
+def createGraphMatrix(vertices,edges):
+  n = len(vertices)
+  adj_matrix = [[0] * n for _ in range(n)]
+
+  for edge in edges:
+    u = vertices.index(edge[0])
+    v = vertices.index(edge[1])
+    adj_matrix[u][v] = 1
+    adj_matrix[v][u] = 1
+
+  return adj_matrix
 
 def existPath(Grafo, v1, v2):
     visited = set()
@@ -141,3 +152,59 @@ def bestRoad(Grafo, v1,v2):
         visited.add(neighbor)
         q.put((neighbor, ruta + [vertex]))  
   return [] 
+
+def PRIM(Grafo):
+  n = len(Grafo) 
+  visitados = [False] * n 
+  padre = [None] * n  
+  costo = [float('inf')] * n  
+  costo[0] = 0
+    
+  for _ in range(n):
+    u = None
+    for i in range(n):
+      if not visitados[i] and (u is None or costo[i] < costo[u]):
+        u = i
+    
+    visitados[u] = True 
+    for v in range(n):
+      if Grafo[u][v] != 0 and not visitados[v] and Grafo[u][v] < costo[v]:
+        costo[v] = Grafo[u][v]
+        padre[v] = u
+    
+  arbol = [[] for _ in range(n)]
+  for v in range(1, n):
+    arbol[padre[v]].append(v)
+    arbol[v].append(padre[v])
+    
+  return arbol
+
+def get_peso(arista):
+  return arista[2]
+
+def KRUSKAL(Grafo):
+  n = len(Grafo)
+  aristas = []
+  for i in range(n):
+    for j in range(i+1, n):
+      if Grafo[i][j] != 0:
+        aristas.append((i, j, Grafo[i][j]))
+  aristas = sorted(aristas, key=get_peso)
+  componentes_conexas = [[i] for i in range(n)]
+   
+  arbol = []
+  for arista in aristas:
+    u, v, peso = arista
+    componente_u = None
+    componente_v = None
+    for componente in componentes_conexas:
+      if u in componente:
+        componente_u = componente
+      if v in componente:
+        componente_v = componente
+    if componente_u != componente_v:
+      arbol.append((u, v))
+      componente_u.extend(componente_v)
+      componentes_conexas.remove(componente_v)
+  return arbol
+
